@@ -1,7 +1,7 @@
 import prisma from "@database";
 import { Prisma } from "@prisma/client";
 
-export class UserRepository {
+class UserRepository {
     async createUser(data: Prisma.UserCreateInput) {
         const user = await prisma.user.create({data});
         return user;
@@ -14,3 +14,5 @@ export class UserRepository {
         return user;
     }
 }
+
+export default new UserRepository();
