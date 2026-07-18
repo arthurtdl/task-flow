@@ -1,6 +1,6 @@
 import app from './app';
 import dotenv from 'dotenv';
-import database from './database';
+import './database';
 
 dotenv.config();
 
