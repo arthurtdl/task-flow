@@ -1,77 +1,13 @@
-generator client {
-  provider = "prisma-client-js"
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// DBML generator configuration
-// You can view the generated DBML in diagram format using https://dbdiagram.io/d
-generator dbml {
-  provider = "node ./node_modules/prisma-dbml-generator/dist/generator.js"
-  projectName = "Task Flow API"
-  projectDatabase = "PostgreSQL"
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
-
-// Enum for the access levels of users in the system
-enum Role {
-  USER
-  ADMIN
-}
-
-// Enum for the status of tasks in the system
-enum TaskStatus {
-  BACKLOG
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-}
-
-model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(USER)
-  createdAt    DateTime @default(now())
-
-  tasks        Task[]   @relation("UserTasks")
-
-  @@map("users")
-}
-
-model Task {
-  id          String     @id @default(uuid())
-  title       String
-  description String?    @db.Text
-  deadline    DateTime?
-  status      TaskStatus @default(BACKLOG)
-  isPriority  Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  // Relating the task to a user (many-to-one relationship)
-  userId      String
-  user        User       @relation("UserTasks", fields: [userId], references: [id], onDelete: Cascade)
-
-  // Relating the task to its attachments (one-to-many relationship)
-  attachments Attachment[]
-
-  @@map("tasks")
-}
-
-model Attachment {
-  id        String   @id @default(uuid())
-  fileName  String
-  fileUrl   String   // URL to the file stored in storage service
-  fileType  String
-  createdAt DateTime @default(now())
-
-  // Relating the attachment to a task (many-to-one relationship)
-  taskId    String
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  @@map("attachments")
-}
-
