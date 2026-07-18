@@ -1,0 +1,13 @@
+import { Router } from "express";
+import userRouter from "../modules/users/user_routes";
+
+const routes = Router();
+
+// All the routes listed here will be prefixed with /api
+routes.use("/users", userRouter);
+
+routes.get('/', (_, res) => {
+    res.status(200).json({ message: 'Welcome to the TaskFlow API' });
+})
+
+export default routes;

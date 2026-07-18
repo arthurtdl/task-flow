@@ -4,11 +4,23 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 const connectionString = process.env.DATABASE_URL;
 
-// These are necessary because of Prisma 7
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
+// Global variable to hold the Prisma client instance
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-const prisma = new PrismaClient({ adapter });
+// Config needed for Prisma 7
+const createPrismaClient = () => {
+  const pool = new Pool({ connectionString });
+  const adapter = new PrismaPg(pool);
+  return new PrismaClient({ adapter });
+};
+
+// If the Prisma client instance already exists, use it. Otherwise, create a new one
+export const prisma = globalForPrisma.prisma || createPrismaClient();
+
+// Save the instance in the global scope in development environment
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}
 
 prisma
   .$connect()
