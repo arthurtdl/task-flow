@@ -28,12 +28,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
 
-      # 4. Install dependencies
-      - name: Install dependencies
+      # --- BACKEND (SERVER) ---
+      - name: Install Server Dependencies
         run: pnpm install --frozen-lockfile
+        working-directory: ./server
 
-      # 5. Run the lint script (the one at the package.json)
-      - name: Run ESLint
+      - name: Run Server ESLint
         run: pnpm run lint
+        working-directory: ./server
+
+      # --- FRONTEND (CLIENT) ---
+      - name: Install Client Dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./client
+
+      - name: Run Client ESLint
+        run: pnpm run lint
+        working-directory: ./client
