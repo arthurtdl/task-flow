@@ -9,7 +9,12 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "types": ["node"]
+    "types": ["node", "jest"],
+    "baseUrl": ".",
+    "paths": {
+      "@database": ["src/database/index.ts"],
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*", "prisma.config.ts"],
 }

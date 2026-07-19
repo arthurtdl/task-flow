@@ -1,0 +1,48 @@
+name: Lint Check
+
+# This workflow runs ESLint on pull requests to the main or develop branches.
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  eslint:
+    name: Run ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      # Sets Node.js 22
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # --- BACKEND (SERVER) ---
+      - name: Install Server Dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./server
+
+      - name: Run Server ESLint
+        run: pnpm run lint
+        working-directory: ./server
+
+      # --- FRONTEND (CLIENT) ---
+      - name: Install Client Dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./client
+
+      - name: Run Client ESLint
+        run: pnpm run lint
+        working-directory: ./client
