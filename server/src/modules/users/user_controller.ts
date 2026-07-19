@@ -3,7 +3,7 @@ import UserService from './user_service';
 
 class UsersController {
   
-  create = async (req: Request, res: Response): Promise<void> => {
+  create = async (req: Request, res: Response) => {
     const user = await UserService.createUser(req.body);
 
     res.status(201).json({
@@ -12,7 +12,7 @@ class UsersController {
     });
   };
 
-  getUserByEmail = async (req: Request, res: Response): Promise<void> => {
+  getUserByEmail = async (req: Request, res: Response) => {
     const email = req.params.email as string;
 
     const user = await UserService.getUserByEmail(email);

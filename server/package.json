@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "prisma generate && tsx watch src/server.ts",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db-push": "docker exec -it taskflow-server pnpm dlx prisma db push"
   },
   "keywords": [],
   "author": "",
