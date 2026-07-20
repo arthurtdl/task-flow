@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import type { UserRole } from "./../lib/types"
+import type { UserRole } from "../types/user_types"
 
 interface AuthState {
   currentUser: { email: string; role: UserRole } | null;
