@@ -12,6 +12,9 @@ export const createUserSchema = z.object({
     .string()
     .min(6, { message: 'Password must be at least 6 characters long' })
     .nonempty({ message: 'Password is required' }),
+    role: z
+    .enum(['USER', 'ADMIN'])
+    .optional(),
 })
 
 export type CreateUserDTO = z.infer<typeof createUserSchema>;
