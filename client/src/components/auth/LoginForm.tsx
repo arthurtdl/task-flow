@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/auth-context";
-import type { UserRole } from "@/types/user_types";
 import { cn } from "@/lib/utils";
 
 export function LoginForm() {
@@ -18,22 +17,43 @@ export function LoginForm() {
   
   const [tab, setTab] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("ana@example.com");
-  const [password, setPassword] = useState("••••••••");
-  const [role, setRole] = useState<UserRole>("user");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (tab === "register") {
-      register(name, email, password);
-      toast.success(`Conta criada. Bem-vindo(a), ${name || "novo usuário"}!`);
-    } else {
-      login(email, password, role);
-      toast.success(`Bem-vindo(a), ${role === "admin" ? "Admin" : "Usuário"}!`);
+    setIsLoading(true);
+
+    try {
+      if (tab === "register") {
+        await register({ name, email, password });
+        toast.success(`Conta criada com sucesso. Bem-vindo(a)!`);
+      } else {
+        await login({ email, password });
+        toast.success(`Bem-vindo(a) de volta!`);
+      }
+      
+      // Se a Promise resolver sem erros, o token já está salvo e podemos navegar
+      router.push("/dashboard");
+    } catch (error: any) {
+      // Captura o erro do Axios (ou erro genérico)
+      const errorMessage = 
+        error.response?.data?.message || 
+        "Ocorreu um erro inesperado. Tente novamente.";
+      
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Navega para o dashboard após o login
-    router.push("/dashboard");
+  };
+
+  // Função auxiliar para trocar de aba e limpar os campos
+  const handleTabChange = (newTab: "login" | "register") => {
+    setTab(newTab);
+    setName("");
+    setEmail("");
+    setPassword("");
   };
 
   return (
@@ -55,7 +75,7 @@ export function LoginForm() {
           <button
             key={t}
             type="button"
-            onClick={() => setTab(t)}
+            onClick={() => handleTabChange(t)}
             className={cn(
               "rounded-md py-2 text-sm font-medium transition-all",
               tab === t
@@ -77,7 +97,8 @@ export function LoginForm() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Seu nome"
+              placeholder="Ex: João da Silva"
+              disabled={isLoading}
               required
             />
           </div>
@@ -90,6 +111,7 @@ export function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="exemplo@email.com"
+            disabled={isLoading}
             required
           />
         </div>
@@ -100,48 +122,23 @@ export function LoginForm() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            disabled={isLoading}
             required
           />
         </div>
 
-        {tab === "login" && (
-          <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">
-              Entrar como (mock)
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setRole("user")}
-                className={cn(
-                  "flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors",
-                  role === "user"
-                    ? "border-primary bg-primary/5 text-foreground"
-                    : "border-input text-muted-foreground hover:bg-accent",
-                )}
-              >
-                <UserIcon className="h-4 w-4" />
-                Usuário
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("admin")}
-                className={cn(
-                  "flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors",
-                  role === "admin"
-                    ? "border-primary bg-primary/5 text-foreground"
-                    : "border-input text-muted-foreground hover:bg-accent",
-                )}
-              >
-                <ShieldCheck className="h-4 w-4" />
-                Admin
-              </button>
-            </div>
-          </div>
-        )}
-
-        <Button type="submit" className="w-full" size="lg">
-          {tab === "login" ? "Entrar" : "Criar conta"}
+        <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Aguarde...
+            </>
+          ) : tab === "login" ? (
+            "Entrar"
+          ) : (
+            "Criar conta"
+          )}
         </Button>
       </form>
     </div>
