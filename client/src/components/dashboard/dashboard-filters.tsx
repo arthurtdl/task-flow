@@ -40,7 +40,9 @@ export function DashboardFilters({
       </div>
       <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as TaskStatus | "all")}>
         <SelectTrigger className="w-full sm:w-52">
-          <SelectValue />
+          <SelectValue placeholder="Todos os status">
+            {statusFilter === "all" ? "Todos os status" : STATUS_LABELS[statusFilter as TaskStatus]}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Todos os status</SelectItem>

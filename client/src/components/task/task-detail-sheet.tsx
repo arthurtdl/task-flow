@@ -33,7 +33,6 @@ interface Props {
 export function TaskDetailSheet({ taskId, onOpenChange, onEdit }: Props) {
   const open = !!taskId;
   
-  // O TanStack Query faz o fetch e guarda em cache automaticamente!
   const { data, isLoading } = useTask(taskId || undefined);
   const task = data as TaskWithExtras | undefined;
 
@@ -105,7 +104,9 @@ export function TaskDetailSheet({ taskId, onOpenChange, onEdit }: Props) {
                     onValueChange={(v) => handleStatusChange(v as TaskStatus)}
                   >
                     <SelectTrigger className="h-8">
-                      <SelectValue />
+                      <SelectValue placeholder="Status">
+                        {STATUS_LABELS[task.status as TaskStatus]}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {STATUS_ORDER.map((s) => (

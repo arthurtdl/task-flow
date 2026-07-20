@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
 import type { Task, TaskStatus } from "@/types/task_types";
-import { STATUS_ORDER } from "@/types/task_types";
+import { STATUS_ORDER, STATUS_LABELS } from "@/types/task_types";
 import { Topbar } from "@/components/layout/topbar";
 import { DashboardFilters } from "@/components/dashboard/dashboard-filters";
 import { KanbanColumn } from "@/components/dashboard/kanban-column";
@@ -82,7 +82,7 @@ export function UserDashboard() {
 
     try {
       await updateTask({ id, data: { status } });
-      toast.success(`Movida para ${status}`);
+      toast.success(`Movida para ${STATUS_LABELS[status]}`);
     } catch (error) {
       console.error(error);
       queryClient.setQueryData(queryKey, previousTasks);
@@ -91,7 +91,7 @@ export function UserDashboard() {
   };
 
   const handleLogout = async () => {
-    await logout(); // Aguarda a limpeza dos cookies
+    await logout();
     router.push("/login");
   };
 
