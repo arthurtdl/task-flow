@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -30,6 +30,12 @@ export function UserDashboard() {
   const [editing, setEditing] = useState<Task | null>(null);
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<TaskStatus | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+    }
+  }, [user, router]);
 
   const visibleTasks = useMemo(() => {
     let list = tasks;
@@ -66,7 +72,6 @@ export function UserDashboard() {
     
     const task = tasks.find((t: Task) => t.id === id);
     if (!task || task.status === status) return;
-    
 
     const queryKey = ["tasks", "user", user.id];
     await queryClient.cancelQueries({ queryKey });
@@ -85,12 +90,18 @@ export function UserDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout(); // Aguarda a limpeza dos cookies
     router.push("/login");
   };
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-muted/30">
+        <p className="text-muted-foreground animate-pulse">Saindo...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30">

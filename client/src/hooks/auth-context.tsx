@@ -46,13 +46,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // Logout clears it all
-  const logout = () => {
-    setCurrentUser(null);
-    setAccessToken(null);
-    delete api.defaults.headers.common["Authorization"];
-    
-    // Forcing cookie deletion
-    document.cookie = 'userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Erro ao fazer logout na API", error);
+    } finally {
+      setCurrentUser(null);
+      setAccessToken(null);
+      delete api.defaults.headers.common["Authorization"];
+      
+      // Force cookie deletion
+      document.cookie = 'userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    }
   };
 
   const isAuthenticated = !!accessToken;

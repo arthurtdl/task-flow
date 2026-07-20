@@ -23,6 +23,19 @@ class AuthController {
     });
   };
 
+  logout = async (req: Request, res: Response): Promise<void> => {
+    await AuthService.logout();
+    res.clearCookie('refreshToken', {
+      httpOnly: true,  
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict', 
+    });
+
+    res.status(200).json({
+      message: 'Logout realizado com sucesso.',
+    });
+  };
+
 }
 
 export default new AuthController();

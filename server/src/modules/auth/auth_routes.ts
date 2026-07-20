@@ -6,5 +6,6 @@ import { loginSchema } from './DTOs/login_dto';
 const authRouter = Router();
 
 authRouter.post('/login', validate(loginSchema), AuthController.login);
+authRouter.post('/logout', AuthController.logout);
 
 export default authRouter;
