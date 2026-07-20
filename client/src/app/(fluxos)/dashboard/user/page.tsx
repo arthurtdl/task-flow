@@ -1,7 +1,9 @@
+import { UserDashboard } from "@/components/dashboard/user-dashboard"
+
 export default function UserPage() {
     return(
         <div>
-            user
+            <UserDashboard></UserDashboard>
         </div>
     )
 }
