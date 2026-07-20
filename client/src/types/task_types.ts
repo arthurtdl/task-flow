@@ -22,3 +22,29 @@ export interface CreateTask {
 }
 
 export type UpdateTask = Partial<CreateTask>;
+
+export const STATUS_ORDER: TaskStatus[] = [
+  'BACKLOG',
+  'PENDING',
+  'IN_PROGRESS',
+  'COMPLETED'
+];
+
+export const STATUS_LABELS: Record<TaskStatus, string> = {
+  BACKLOG: 'Backlog',
+  PENDING: 'Pendente',
+  IN_PROGRESS: 'Em Andamento',
+  COMPLETED: 'Concluído',
+};
+
+export interface TaskAttachment {
+  id: string;
+  url: string;
+  name: string;
+  isImage: boolean;
+}
+
+export interface TaskWithExtras extends Task {
+  attachments?: TaskAttachment[];
+  authorName?: string;
+}
