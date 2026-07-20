@@ -53,7 +53,7 @@ export function DashboardFilters({
           ))}
         </SelectContent>
       </Select>
-      <Button onClick={onNewTask}>
+      <Button className='cursor-pointer' onClick={onNewTask}>
         <Plus className="h-4 w-4" />
         Nova tarefa
       </Button>
