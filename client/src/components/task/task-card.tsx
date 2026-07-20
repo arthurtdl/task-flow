@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { format } from "date-fns";
 import {
   CalendarIcon,
@@ -18,7 +19,6 @@ import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { cn } from "@/lib/utils";
 import type { Task, TaskWithExtras } from "@/types/task_types";
 import { useUpdateTask, useDeleteTask } from "@/hooks/use_tasks";
-import { useState } from "react";
 
 interface Props {
   task: TaskWithExtras;
@@ -34,9 +34,6 @@ export function TaskCard({ task, showAuthor, onEdit, onOpen }: Props) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const safeAttachments = task.attachments || [];
-  const imageAttachments = safeAttachments.filter((a) => a.isImage);
-  const otherAttachments = safeAttachments.filter((a) => !a.isImage);
-
   const isDone = task.status === "COMPLETED";
 
   const overdue =
@@ -137,19 +134,6 @@ export function TaskCard({ task, showAuthor, onEdit, onOpen }: Props) {
           </p>
         )}
 
-        {imageAttachments.length > 0 && (
-          <div className="grid grid-cols-3 gap-1 mt-2">
-            {imageAttachments.slice(0, 3).map((att) => (
-              <img
-                key={att.id}
-                src={att.url}
-                alt={att.name}
-                className="h-14 w-full object-cover rounded-sm border"
-              />
-            ))}
-          </div>
-        )}
-
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-3">
           {task.deadline && (
             <span
@@ -162,10 +146,10 @@ export function TaskCard({ task, showAuthor, onEdit, onOpen }: Props) {
               {format(new Date(task.deadline), "dd/MM")}
             </span>
           )}
-          {otherAttachments.length > 0 && (
+          {safeAttachments.length > 0 && (
             <span className="inline-flex items-center gap-1">
               <Paperclip className="h-3 w-3" />
-              {otherAttachments.length}
+              {safeAttachments.length}
             </span>
           )}
           {showAuthor && task.authorName && (

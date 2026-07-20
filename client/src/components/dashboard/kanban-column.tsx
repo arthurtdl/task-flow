@@ -32,6 +32,7 @@ interface KanbanColumnProps {
   onDrop: (e: React.DragEvent, status: TaskStatus) => void;
   onEdit: (t: Task) => void;
   onOpen: (t: Task) => void;
+  showAuthor: boolean;
 }
 
 export function KanbanColumn({
@@ -43,6 +44,7 @@ export function KanbanColumn({
   onDrop,
   onEdit,
   onOpen,
+  showAuthor
 }: KanbanColumnProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const styles = COLUMN_STYLES[status];
@@ -80,7 +82,7 @@ export function KanbanColumn({
           </div>
         ) : (
           pageItems.map((t: Task) => (
-            <TaskCard key={t.id} task={t} showAuthor={false} onEdit={onEdit} onOpen={onOpen} />
+            <TaskCard key={t.id} task={t} showAuthor={showAuthor} onEdit={onEdit} onOpen={onOpen} />
           ))
         )}
       </div>

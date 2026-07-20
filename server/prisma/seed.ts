@@ -26,7 +26,7 @@ async function main() {
   // Criando os usuários e encadeando os relacionamentos no mesmo formato de CreateInput da imagem
   const userData: Prisma.UserCreateInput[] = [
     {
-      name: 'Admin Supremo',
+      name: 'Admin',
       email: 'admin@teste.com',
       passwordHash,
       role: Role.ADMIN,
@@ -50,7 +50,7 @@ async function main() {
       }
     },
     {
-      name: 'João Trabalhador',
+      name: 'João',
       email: 'joao@teste.com',
       passwordHash,
       role: Role.USER,

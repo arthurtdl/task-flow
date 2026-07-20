@@ -7,28 +7,46 @@ class TaskRepository {
     return task;
   }
 
-  async getTaskById(id: string): Promise<Task | null> {
+  async getTaskById(id: string) {
     const task = await prisma.task.findUnique({
       where: { id },
+      include: {
+        attachments: true, // Traz todos os anexos vinculados a esta task
+        user: {
+          select: { name: true } // Traz apenas o nome do usuário (protege a senha)
+        }
+      }
     });
     return task;
   }
 
-  async getTasksByUserId(userId: string): Promise<Task[]> {
+  async getTasksByUserId(userId: string) {
     const tasks = await prisma.task.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' } // Order tasks by creation date in descending order
+      orderBy: { createdAt: 'desc' },
+      include: {
+        attachments: true,
+        user: {
+          select: { name: true }
+        }
+      }
     });
     return tasks;
   }
 
-  async getAllTasks(): Promise<Task[]> {
+  async getAllTasks() {
     const tasks = await prisma.task.findMany({
-      orderBy: { createdAt: 'desc' } // Same descending order
+      orderBy: { createdAt: 'desc' },
+      include: {
+        attachments: true,
+        user: {
+          select: { name: true }
+        }
+      }
     });
     return tasks;
   }
-
+  
   async updateTask(id: string, data: Prisma.TaskUpdateInput): Promise<Task> {
     const task = await prisma.task.update({
       where: { id },

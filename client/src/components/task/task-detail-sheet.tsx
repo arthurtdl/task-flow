@@ -43,9 +43,15 @@ interface Props {
   taskId: string | null;
   onOpenChange: (open: boolean) => void;
   onEdit: (task: Task) => void;
+  showAuthor: boolean;
 }
 
-export function TaskDetailSheet({ taskId, onOpenChange, onEdit }: Props) {
+export function TaskDetailSheet({
+  taskId,
+  onOpenChange,
+  onEdit,
+  showAuthor,
+}: Props) {
   const open = !!taskId;
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -108,7 +114,7 @@ export function TaskDetailSheet({ taskId, onOpenChange, onEdit }: Props) {
                 <Badge variant="outline" className="font-mono text-[10px]">
                   {task.id.split("-")[0]}
                 </Badge>
-                {task.authorName && (
+                {showAuthor && task.authorName && (
                   <Badge variant="secondary" className="gap-1 font-normal">
                     <UserIcon className="h-3 w-3" />
                     {task.authorName}

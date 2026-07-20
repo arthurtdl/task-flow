@@ -22,6 +22,14 @@ export function useTask(taskId?: string) {
   });
 }
 
+export function useAllTasks(enabled: boolean = true) {
+  return useQuery({
+    queryKey: ["tasks", "all"],
+    queryFn: () => taskService.getTasks(),
+    enabled,
+  });
+}
+
 // ==========================================
 // MUTATIONS (POST, PATCH, DELETE)
 // ==========================================

@@ -1,7 +1,9 @@
+import { UserDashboard } from "@/components/dashboard/user-dashboard"
+
 export default function AdminPage() {
     return(
         <div>
-            admin
+            <UserDashboard adminMode={true}></UserDashboard>
         </div>
     )
 }

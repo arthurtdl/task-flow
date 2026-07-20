@@ -13,15 +13,23 @@ import { KanbanColumn } from "@/components/dashboard/kanban-column";
 import { TaskFormDialog } from "@/components/task/task-form-dialog"; 
 import { TaskDetailSheet } from "@/components/task/task-detail-sheet";
 import { useAuth } from "@/hooks/auth-context";
+import { useTasksByUser, useAllTasks, useUpdateTask } from "@/hooks/use_tasks";
 
-import { useTasksByUser, useUpdateTask } from "@/hooks/use_tasks";
+interface DashboardProps {
+  adminMode?: boolean;
+}
 
-export function UserDashboard() {
+export function UserDashboard({ adminMode = false }: DashboardProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { currentUser: user, logout } = useAuth();
 
-  const { data: tasks = [], isLoading } = useTasksByUser(user?.id);
+  const { data: userTasks = [], isLoading: loadUser } = useTasksByUser(adminMode ? undefined : user?.id);
+  const { data: allTasks = [], isLoading: loadAll } = useAllTasks(adminMode);
+  
+  const tasks = adminMode ? allTasks : userTasks;
+  const isLoading = adminMode ? loadAll : loadUser;
+
   const { mutateAsync: updateTask } = useUpdateTask();
 
   const [query, setQuery] = useState("");
@@ -73,7 +81,8 @@ export function UserDashboard() {
     const task = tasks.find((t: Task) => t.id === id);
     if (!task || task.status === status) return;
 
-    const queryKey = ["tasks", "user", user.id];
+    const queryKey = adminMode ? ["tasks", "all"] : ["tasks", "user", user.id];
+    
     await queryClient.cancelQueries({ queryKey });
     const previousTasks = queryClient.getQueryData(queryKey);
     queryClient.setQueryData(queryKey, (old: Task[] | undefined) => 
@@ -118,7 +127,7 @@ export function UserDashboard() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20 text-muted-foreground">
-            Carregando o seu Kanban...
+            Carregando o Kanban...
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -133,6 +142,7 @@ export function UserDashboard() {
                 onDrop={handleDrop}
                 onEdit={(t: Task) => { setEditing(t); setDialogOpen(true); }}
                 onOpen={(t: Task) => setOpenTaskId(t.id)}
+                showAuthor={adminMode}
               />
             ))}
           </div>
@@ -149,6 +159,7 @@ export function UserDashboard() {
         taskId={openTaskId}
         onOpenChange={(o: boolean) => !o && setOpenTaskId(null)}
         onEdit={(t: Task) => { setOpenTaskId(null); setEditing(t); setDialogOpen(true); }}
+        showAuthor={adminMode}
       />
     </div>
   );
