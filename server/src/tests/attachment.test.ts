@@ -1,7 +1,17 @@
 import request from 'supertest';
+import jwt from 'jsonwebtoken';
 import app from '../app';
 
 describe('Attachments Module (Integration)', () => {
+  let validToken: string;
+
+  beforeAll(() => {
+    validToken = jwt.sign(
+      { id: 'fake-user-id', role: 'USER' },
+      process.env.JWT_ACCESS_SECRET || 'super_secret_key',
+      { expiresIn: '15m' }
+    );
+  });
   
   describe('POST /api/attachments', () => {
     it('should return a 400 error if the file URL is invalid', async () => {
@@ -14,6 +24,7 @@ describe('Attachments Module (Integration)', () => {
 
       const response = await request(app)
         .post('/api/attachments')
+        .set('Authorization', `Bearer ${validToken}`)
         .send(invalidAttachment);
 
       expect(response.status).toBe(400);
@@ -25,11 +36,12 @@ describe('Attachments Module (Integration)', () => {
         fileName: 'imagem.png',
         fileUrl: 'https://meubucket.com/imagem.png',
         fileType: 'image/png',
-        taskId: 'id-invalido' // Not a valid UUID
+        taskId: 'id-invalido'
       };
 
       const response = await request(app)
         .post('/api/attachments')
+        .set('Authorization', `Bearer ${validToken}`)
         .send(invalidAttachment);
 
       expect(response.status).toBe(400);
