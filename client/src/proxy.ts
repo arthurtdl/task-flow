@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getRoleFromToken } from './lib/getRoleFromToken';
 
 export default function proxy(request: NextRequest) {
   // Try's to get the cookie from Refresh Token
@@ -7,10 +8,13 @@ export default function proxy(request: NextRequest) {
   
   const { pathname } = request.nextUrl;
 
+  // Extract the role if authenticated
+  const role = refreshToken ? getRoleFromToken(refreshToken) : 'user';
+
   // Cases where user try's to reach the default route
   if (pathname === '/') {
     if (refreshToken) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      return NextResponse.redirect(new URL(`/dashboard/${role}`, request.url));
     }
     return NextResponse.redirect(new URL('/login', request.url));
   }
@@ -21,9 +25,19 @@ export default function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
+  // Role-based route protection and route completion within dashboard
+  if (refreshToken && pathname.startsWith('/dashboard')) {
+    if (role === 'user' && pathname.startsWith('/dashboard/admin')) {
+      return NextResponse.redirect(new URL('/dashboard/user', request.url));
+    }
+    if (pathname === '/dashboard') {
+      return NextResponse.redirect(new URL(`/dashboard/${role}`, request.url));
+    }
+  }
+
   // If authenticated user try's to go to login page, redirect to dashboard
-  if (refreshToken && (pathname === '/login' || pathname === '/register' || pathname === '/')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  if (refreshToken && (pathname === '/login' || pathname === '/register')) {
+    return NextResponse.redirect(new URL(`/dashboard/${role}`, request.url));
   }
 
   return NextResponse.next();
@@ -32,6 +46,7 @@ export default function proxy(request: NextRequest) {
 // Affected routes
 export const config = {
   matcher: [
+    '/',
     '/dashboard/:path*',
     '/login',
     '/register'
