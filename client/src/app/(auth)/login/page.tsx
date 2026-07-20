@@ -14,7 +14,7 @@ export default function LoginPage() {
   // Redirect if already logged
   useEffect(() => {
     if (currentUser) {
-      router.push("/dashboard"); 
+      router.push(`/dashboard/${(currentUser.role as string).toLocaleLowerCase()}`); 
     }
   }, [currentUser, router]);
 
@@ -46,7 +46,7 @@ export default function LoginPage() {
 
         <div className="relative flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-white/60">
           <span className="h-px w-10 bg-white/40" />
-          © 2026 TaskFlow Labs
+          © 2026 TaskFlow
         </div>
       </aside>
 
