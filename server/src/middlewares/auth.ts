@@ -33,11 +33,11 @@ export default function auth(req: Request, res: Response, next: NextFunction) {
     (req as any).userRole = decoded.role;
 
     next();
-  } catch (error) {
+  } catch (_error) {
     return next(
       new HttpException(
         401,
-        `Unauthorized. Token expired or invalid. ${error}`,
+        `Unauthorized. Token expired or invalid.`,
       ),
     );
   }
