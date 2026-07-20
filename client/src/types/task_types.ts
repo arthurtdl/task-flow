@@ -39,9 +39,11 @@ export const STATUS_LABELS: Record<TaskStatus, string> = {
 
 export interface TaskAttachment {
   id: string;
-  url: string;
-  name: string;
-  isImage: boolean;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  createdAt?: string; // Opcional, caso você queira exibir a data de upload no front
+  taskId?: string;    // Opcional, útil para ter a referência da tarefa pai
 }
 
 export interface TaskWithExtras extends Task {
