@@ -42,11 +42,13 @@ export interface TaskAttachment {
   fileName: string;
   fileUrl: string;
   fileType: string;
-  createdAt?: string; // Opcional, caso você queira exibir a data de upload no front
-  taskId?: string;    // Opcional, útil para ter a referência da tarefa pai
+  createdAt?: string;
+  taskId?: string;
 }
 
 export interface TaskWithExtras extends Task {
   attachments?: TaskAttachment[];
-  authorName?: string;
+  user?: {
+    name: string;
+  }; 
 }

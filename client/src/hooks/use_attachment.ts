@@ -26,6 +26,7 @@ export function useCreateAttachment() {
     mutationFn: (data: CreateAttachment) => attachmentService.createAttachment(data),
     onSuccess: (newAttachment) => {
       queryClient.invalidateQueries({ queryKey: ["attachments", "task", newAttachment.taskId] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 }
@@ -36,6 +37,7 @@ export function useDeleteAttachment() {
   return useMutation({
     mutationFn: (id: string) => attachmentService.deleteAttachment(id),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
       queryClient.invalidateQueries({ queryKey: ["attachments"] });
     },
   });

@@ -39,8 +39,8 @@ export function useCreateTask() {
 
   return useMutation({
     mutationFn: (data: CreateTask) => taskService.createTask(data),
-    onSuccess: (newTask) => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", "user", newTask.userId] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 }
@@ -51,9 +51,8 @@ export function useUpdateTask() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTask }) =>
       taskService.updateTask(id, data),
-    onSuccess: (updatedTask) => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", updatedTask.id] });
-      queryClient.invalidateQueries({ queryKey: ["tasks", "user", updatedTask.userId] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 }

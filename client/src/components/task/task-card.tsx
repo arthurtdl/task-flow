@@ -152,10 +152,10 @@ export function TaskCard({ task, showAuthor, onEdit, onOpen }: Props) {
               {safeAttachments.length}
             </span>
           )}
-          {showAuthor && task.authorName && (
+          {showAuthor && task.user?.name && (
             <Badge variant="secondary" className="ml-auto gap-1 font-normal">
               <UserIcon className="h-3 w-3" />
-              {task.authorName}
+              {task.user?.name}
             </Badge>
           )}
         </div>
