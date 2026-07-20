@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getRoleFromToken } from './lib/getRoleFromToken';
 
 export default function proxy(request: NextRequest) {
   // Try's to get the cookie from Refresh Token
   const refreshToken = request.cookies.get('refreshToken')?.value;
+  const userRoleCookie = request.cookies.get('userRole')?.value;
   
   const { pathname } = request.nextUrl;
+  const role = (userRoleCookie || 'user').toLowerCase();
 
-  // Extract the role if authenticated
-  const role = refreshToken ? getRoleFromToken(refreshToken) : 'user';
 
   // Cases where user try's to reach the default route
   if (pathname === '/') {

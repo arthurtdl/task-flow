@@ -31,6 +31,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(data.user);
     setAccessToken(data.accessToken);
 
+    // Simple cookie with role
+    document.cookie = `userRole=${data.user.role}; path=/; max-age=${60 * 60 * 24 * 7}`
+
     // Inject the access token
     api.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
   };
@@ -47,6 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(null);
     setAccessToken(null);
     delete api.defaults.headers.common["Authorization"];
+    
+    // Forcing cookie deletion
+    document.cookie = 'userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   };
 
   const isAuthenticated = !!accessToken;

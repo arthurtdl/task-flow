@@ -7,7 +7,9 @@
     "dev": "prisma generate && tsx watch src/server.ts",
     "test": "jest",
     "lint": "eslint .",
-    "db-push": "docker exec -it taskflow-server pnpm dlx prisma db push"
+    "db-push": "docker exec -it taskflow-server pnpm dlx prisma db push",
+    "seed": "npx prisma db seed",
+    "seed:docker": "docker compose exec server pnpm run seed"
   },
   "keywords": [],
   "author": "",
