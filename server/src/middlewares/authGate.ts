@@ -6,7 +6,9 @@ import { normalize } from './../utils/normalize'
 const PUBLIC_ROUTES: { method: string; path: string }[] = [
   { method: 'POST', path: '/users' },      // Sign up
   { method: 'POST', path: '/auth/login' }, // Sign in
-  { method: 'GET', path: '/' }
+  { method: 'GET', path: '/' },
+  { method: "GET", path: "/auth/me" },
+  { method: "POST", path: "/auth/logout" },
 ];
 
 export default function authGate(req: Request, res: Response, next: NextFunction) {
