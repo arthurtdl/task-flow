@@ -13,7 +13,18 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (error) => {
-    console.error('❌ Erro na API:', error.response?.data || error.message);
+    const url = error.config?.url;
+
+    // Expected, so it's not ERROR
+    if (url === "/auth/me" && error.response?.status === 401) {
+      return Promise.reject(error);
+    }
+
+    console.error(
+      "❌ Erro na API:",
+      error.response?.data || error.message
+    );
+
     return Promise.reject(error);
   }
 );
