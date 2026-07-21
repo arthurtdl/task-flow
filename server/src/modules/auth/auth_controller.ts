@@ -6,12 +6,13 @@ class AuthController {
   login = async (req: Request, res: Response): Promise<void> => {
     
     const result = await AuthService.login(req.body);
+    const isProduction = process.env.NODE_ENV === 'production';
 
     // Configure Cookie HttpOnly with the Refresh Token
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,  
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, 
     });
 
@@ -25,10 +26,13 @@ class AuthController {
 
   logout = async (req: Request, res: Response): Promise<void> => {
     await AuthService.logout();
+
+    const isProduction = process.env.NODE_ENV === 'production';
+
     res.clearCookie('refreshToken', {
       httpOnly: true,  
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none', 
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax', 
     });
 
     res.status(200).json({

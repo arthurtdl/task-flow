@@ -27,7 +27,11 @@ import type { TaskStatus, TaskWithExtras } from "@/types/task_types";
 import { STATUS_LABELS, STATUS_ORDER } from "@/types/task_types";
 import { useAuth } from "@/hooks/auth-context";
 import { useCreateTask, useUpdateTask } from "@/hooks/use_tasks";
-import { useCreateAttachment, useDeleteAttachment } from "@/hooks/use_attachment"; 
+import {
+  useCreateAttachment,
+  useDeleteAttachment,
+} from "@/hooks/use_attachment";
+import { attachmentService } from "@/services/attachment_service";
 
 interface Props {
   open: boolean;
@@ -37,27 +41,34 @@ interface Props {
 
 export function TaskFormDialog({ open, onOpenChange, task }: Props) {
   const { currentUser } = useAuth();
-  
+
   const { mutateAsync: createTask, isPending: isCreating } = useCreateTask();
   const { mutateAsync: updateTask, isPending: isUpdating } = useUpdateTask();
-  const { mutateAsync: createAttachment, isPending: isAttaching } = useCreateAttachment();
+  const { mutateAsync: createAttachment, isPending: isAttaching } =
+    useCreateAttachment();
   const { mutateAsync: deleteAttachment } = useDeleteAttachment();
-  
+
   const isLoading = isCreating || isUpdating || isAttaching;
-  
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<TaskStatus>("BACKLOG");
 
   const [newFiles, setNewFiles] = useState<File[]>([]);
-  const [existingAttachments, setExistingAttachments] = useState(task?.attachments || []);
+  const [existingAttachments, setExistingAttachments] = useState(
+    task?.attachments || [],
+  );
 
   useEffect(() => {
     if (task && open) {
       setTitle(task.title);
       setDescription(task.description || "");
-      setDeadline(task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : "");
+      setDeadline(
+        task.deadline
+          ? new Date(task.deadline).toISOString().split("T")[0]
+          : "",
+      );
       setStatus(task.status);
       setExistingAttachments(task.attachments || []);
     } else if (open) {
@@ -81,10 +92,16 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
   };
 
   const handleRemoveExistingAttachment = async (attachmentId: string) => {
-    if (!confirm("Remover este anexo permanentemente?")) return;
     try {
+      const attachmentToRemove = existingAttachments.find((a) => a.id === attachmentId);
+      if (attachmentToRemove?.fileUrl) {
+        await attachmentService.deleteFromSupabase(attachmentToRemove.fileUrl);
+      }
       await deleteAttachment(attachmentId);
-      setExistingAttachments((prev) => prev.filter((a) => a.id !== attachmentId));
+      
+      setExistingAttachments((prev) =>
+        prev.filter((a) => a.id !== attachmentId),
+      );
       toast.success("Anexo removido");
     } catch {
       toast.error("Erro ao remover anexo");
@@ -94,7 +111,7 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) return;
-    
+
     try {
       let currentTaskId = task?.id;
 
@@ -106,7 +123,7 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
             description,
             status,
             deadline: deadline ? new Date(deadline).toISOString() : undefined,
-          }
+          },
         });
         toast.success("Tarefa atualizada com sucesso!");
       } else {
@@ -122,15 +139,21 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
       }
 
       if (newFiles.length > 0 && currentTaskId) {
+        toast.info("Enviando anexos...");
         for (const file of newFiles) {
-          const fakeUrl = URL.createObjectURL(file); 
+          try {
+            const uploadedData = await attachmentService.uploadToSupabase(file);
 
-          await createAttachment({
-            taskId: currentTaskId,
-            fileUrl: fakeUrl,
-            fileName: file.name,
-            fileType: file.type,
-          });
+            await createAttachment({
+              taskId: currentTaskId,
+              fileUrl: uploadedData.fileUrl,
+              fileName: uploadedData.fileName,
+              fileType: uploadedData.fileType,
+            });
+          } catch (uploadError) {
+            console.error(`Erro ao subir o arquivo ${file.name}:`, uploadError);
+            toast.error(`Falha ao salvar o anexo: ${file.name}`);
+          }
         }
         toast.success("Anexos salvos com sucesso!");
       }
@@ -148,7 +171,7 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
         <DialogHeader>
           <DialogTitle>{task ? "Editar Tarefa" : "Nova Tarefa"}</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="title">Título</Label>
@@ -160,7 +183,7 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>
             <Textarea
@@ -176,7 +199,10 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select value={STATUS_LABELS[status]} onValueChange={(v) => setStatus(v as TaskStatus)}>
+              <Select
+                value={STATUS_LABELS[status]}
+                onValueChange={(v) => setStatus(v as TaskStatus)}
+              >
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
@@ -203,19 +229,22 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
 
           <div className="space-y-3 pt-2 border-t">
             <Label>Anexos</Label>
-            
+
             {existingAttachments.length > 0 && (
               <div className="flex flex-col gap-2">
                 {existingAttachments.map((att) => (
-                  <div key={att.id} className="flex items-center justify-between p-2 border rounded-md bg-muted/30 text-sm">
+                  <div
+                    key={att.id}
+                    className="flex items-center justify-between p-2 border rounded-md bg-muted/30 text-sm"
+                  >
                     <div className="flex items-center gap-2 overflow-hidden">
                       <Paperclip className="h-4 w-4 shrink-0 text-muted-foreground" />
                       <span className="truncate max-w-50">{att.fileName}</span>
                     </div>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
                       className="h-6 w-6 text-destructive"
                       onClick={() => handleRemoveExistingAttachment(att.id)}
                     >
@@ -229,15 +258,20 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
             {newFiles.length > 0 && (
               <div className="flex flex-col gap-2">
                 {newFiles.map((file, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 border border-primary/20 rounded-md bg-primary/5 text-sm">
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-2 border border-primary/20 rounded-md bg-primary/5 text-sm"
+                  >
                     <div className="flex items-center gap-2 overflow-hidden">
                       <FileIcon className="h-4 w-4 shrink-0 text-primary" />
-                      <span className="truncate max-w-50 font-medium">{file.name}</span>
+                      <span className="truncate max-w-50 font-medium">
+                        {file.name}
+                      </span>
                     </div>
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
                       className="h-6 w-6"
                       onClick={() => handleRemoveNewFile(idx)}
                     >
@@ -249,13 +283,17 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
             )}
 
             <div className="relative">
-              <Input 
-                type="file" 
-                multiple 
-                onChange={handleFileSelect} 
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+              <Input
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
-              <Button type="button" variant="outline" className="w-full gap-2 pointer-events-none">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full gap-2 pointer-events-none"
+              >
                 <Paperclip className="h-4 w-4" />
                 Adicionar Arquivos
               </Button>
@@ -263,9 +301,9 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
           </div>
 
           <DialogFooter className="pt-4 border-t">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >

@@ -39,6 +39,7 @@ import { useTask, useUpdateTask, useDeleteTask } from "@/hooks/use_tasks";
 import { useDeleteAttachment } from "@/hooks/use_attachment";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { fixDateOffset } from "@/lib/fixDataOffset";
+import { attachmentService } from "@/services/attachment_service";
 
 interface Props {
   taskId: string | null;
@@ -89,7 +90,12 @@ export function TaskDetailSheet({
 
   const handleRemoveAttachment = async (attachmentId: string) => {
     try {
+      const attachmentToRemove = safeAttachments.find((a: TaskAttachment) => a.id === attachmentId);
+      if (attachmentToRemove?.fileUrl) {
+        await attachmentService.deleteFromSupabase(attachmentToRemove.fileUrl);
+      }
       await deleteAttachment(attachmentId);
+      
       toast.success("Anexo removido");
     } catch {
       toast.error("Erro ao remover anexo");
