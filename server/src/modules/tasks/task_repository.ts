@@ -11,9 +11,9 @@ class TaskRepository {
     const task = await prisma.task.findUnique({
       where: { id },
       include: {
-        attachments: true, // Traz todos os anexos vinculados a esta task
+        attachments: true,
         user: {
-          select: { name: true } // Traz apenas o nome do usuário (protege a senha)
+          select: { name: true }
         }
       }
     });
