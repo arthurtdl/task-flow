@@ -19,6 +19,7 @@ class UserService {
       name: data.name,
       email: data.email,
       passwordHash: hashedPassword,
+      role: data.role,
     });
 
     // Return the user without the password hash
