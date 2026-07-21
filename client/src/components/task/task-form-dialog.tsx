@@ -92,9 +92,13 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
   };
 
   const handleRemoveExistingAttachment = async (attachmentId: string) => {
-    if (!confirm("Remover este anexo permanentemente?")) return;
     try {
+      const attachmentToRemove = existingAttachments.find((a) => a.id === attachmentId);
+      if (attachmentToRemove?.fileUrl) {
+        await attachmentService.deleteFromSupabase(attachmentToRemove.fileUrl);
+      }
       await deleteAttachment(attachmentId);
+      
       setExistingAttachments((prev) =>
         prev.filter((a) => a.id !== attachmentId),
       );
@@ -150,8 +154,8 @@ export function TaskFormDialog({ open, onOpenChange, task }: Props) {
             console.error(`Erro ao subir o arquivo ${file.name}:`, uploadError);
             toast.error(`Falha ao salvar o anexo: ${file.name}`);
           }
-          toast.success("Anexos salvos com sucesso!");
         }
+        toast.success("Anexos salvos com sucesso!");
       }
 
       onOpenChange(false);

@@ -30,6 +30,26 @@ export const attachmentService = {
     };
   },
 
+  deleteFromSupabase: async (fileUrl: string) => {
+    try {
+      const filePath = fileUrl.split("/public/attachments/")[1];
+      if (!filePath) {
+        console.warn("⚠️ Caminho do arquivo não foi extraído corretamente.");
+        return;
+      }
+
+      const { error } = await supabase.storage
+        .from("attachments")
+        .remove([filePath]);
+
+      if (error) {
+        console.error("Erro no Supabase ao apagar:", error);
+      }
+    } catch (error) {
+      console.error("Erro ao deletar do Supabase:", error);
+    }
+  },
+
   createAttachment: async (data: CreateAttachment): Promise<Attachment> => {
     const response = await api.post('/attachments', data);
     return response.data.data;
