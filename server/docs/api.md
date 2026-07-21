@@ -77,6 +77,77 @@ Delete endpoints return **204 No Content**.
 
 ---
 
+# GET /api/auth/me
+
+Restores the authenticated session using the **refresh token cookie**.
+
+## Authentication
+
+Requires a valid **refreshToken** cookie.
+
+No Authorization header is required.
+
+## Request
+
+No request body.
+
+The browser must send the authentication cookie automatically.
+
+## Responses
+
+| Status | Description |
+|--------|-------------|
+| 200 | Session restored successfully |
+| 401 | Missing, invalid or expired refresh token |
+| 404 | User not found |
+
+### Response (200)
+
+```json
+{
+  "message": "Session restored successfully.",
+  "data": {
+    "accessToken": "<new_jwt>",
+    "user": {
+      "id": "uuid",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "USER"
+    }
+  }
+}
+```
+
+---
+
+# POST /api/auth/logout
+
+Logs out the current user by clearing the **refresh token cookie**.
+
+## Authentication
+
+Requires the **refreshToken** cookie.
+
+## Request
+
+No request body.
+
+## Responses
+
+| Status | Description |
+|--------|-------------|
+| 200 | Logout successful |
+
+### Response (200)
+
+```json
+{
+  "message": "Logout realizado com sucesso."
+}
+```
+
+---
+
 # POST /api/users
 
 Creates a user.

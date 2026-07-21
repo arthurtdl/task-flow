@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Task Manager",
+  title: "TaskFlow",
   description: "Acesse o painel de gestão de tarefas.",
 };
 

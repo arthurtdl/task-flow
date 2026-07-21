@@ -22,7 +22,8 @@ interface DashboardProps {
 export function UserDashboard({ adminMode = false }: DashboardProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { currentUser: user, logout } = useAuth();
+
+  const { currentUser: user, logout, isLoading: isAuthLoading } = useAuth();
 
   const { data: userTasks = [], isLoading: loadUser } = useTasksByUser(adminMode ? undefined : user?.id);
   const { data: allTasks = [], isLoading: loadAll } = useAllTasks(adminMode);
@@ -40,10 +41,10 @@ export function UserDashboard({ adminMode = false }: DashboardProps) {
   const [dragOver, setDragOver] = useState<TaskStatus | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!isAuthLoading && !user) {
       router.push("/login");
     }
-  }, [user, router]);
+  }, [isAuthLoading, user, router]);
 
   const visibleTasks = useMemo(() => {
     let list = tasks;
@@ -104,12 +105,16 @@ export function UserDashboard({ adminMode = false }: DashboardProps) {
     router.push("/login");
   };
 
-  if (!user) {
+  if (isAuthLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/30">
-        <p className="text-muted-foreground animate-pulse">Saindo...</p>
+        <p className="text-muted-foreground animate-pulse">Carregando sessão...</p>
       </div>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (

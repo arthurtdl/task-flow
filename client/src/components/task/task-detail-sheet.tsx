@@ -87,7 +87,6 @@ export function TaskDetailSheet({
   };
 
   const handleRemoveAttachment = async (attachmentId: string) => {
-    if (!confirm("Remover este anexo permanentemente?")) return;
     try {
       await deleteAttachment(attachmentId);
       toast.success("Anexo removido");

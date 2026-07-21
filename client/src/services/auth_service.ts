@@ -7,6 +7,11 @@ export const authService = {
     return response.data.data;
   },
 
+  me: async(): Promise<AuthResponse> => {
+    const response = await api.get('/auth/me');
+    return response.data.data;
+  },
+
   logout: async(): Promise<void> => {
     await api.post('/auth/logout');
   }

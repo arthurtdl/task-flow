@@ -36,6 +36,18 @@ class AuthController {
     });
   };
 
+  me = async (req: Request, res: Response): Promise<void> => {
+    // Capture the cookie by withCredentials
+    const refreshToken = req.cookies?.refreshToken;
+    
+    const result = await AuthService.me(refreshToken);
+
+    res.status(200).json({
+      message: 'Sessão restaurada com sucesso.',
+      data: result,
+    });
+  };
+
 }
 
 export default new AuthController();
