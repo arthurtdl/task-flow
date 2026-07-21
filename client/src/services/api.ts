@@ -6,6 +6,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  // eslint-disable-next-line no-console
   console.log(`🌐 ${config.method?.toUpperCase()} -> ${config.url}`, config.data);
   return config;
 });

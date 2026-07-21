@@ -34,13 +34,9 @@ export function LoginForm() {
         toast.success(`Bem-vindo(a) de volta!`);
       }
       
-      // Se a Promise resolver sem erros, o token já está salvo e podemos navegar
       router.push("/dashboard");
-    } catch (error: any) {
-      // Captura o erro do Axios (ou erro genérico)
-      const errorMessage = 
-        error.response?.data?.message || 
-        "Ocorreu um erro inesperado. Tente novamente.";
+    } catch {
+      const errorMessage = "Ocorreu um erro inesperado. Tente novamente.";
       
       toast.error(errorMessage);
     } finally {
@@ -48,7 +44,6 @@ export function LoginForm() {
     }
   };
 
-  // Função auxiliar para trocar de aba e limpar os campos
   const handleTabChange = (newTab: "login" | "register") => {
     setTab(newTab);
     setName("");
@@ -69,7 +64,6 @@ export function LoginForm() {
         </p>
       </div>
 
-      {/* Abas */}
       <div className="grid grid-cols-2 rounded-lg bg-muted p-1 mb-6">
         {(["login", "register"] as const).map((t) => (
           <button
