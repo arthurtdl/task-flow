@@ -19,6 +19,7 @@ import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 import { cn } from "@/lib/utils";
 import type { Task, TaskWithExtras } from "@/types/task_types";
 import { useUpdateTask, useDeleteTask } from "@/hooks/use_tasks";
+import { fixDateOffset } from "@/lib/fixDataOffset";
 
 interface Props {
   task: TaskWithExtras;
@@ -39,7 +40,7 @@ export function TaskCard({ task, showAuthor, onEdit, onOpen }: Props) {
   const overdue =
     task.deadline &&
     !isDone &&
-    new Date(task.deadline).getTime() < Date.now() - 24 * 60 * 60 * 1000;
+    fixDateOffset(task.deadline).getTime() < Date.now() - 24 * 60 * 60 * 1000;
 
   const handleComplete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -143,7 +144,7 @@ export function TaskCard({ task, showAuthor, onEdit, onOpen }: Props) {
               )}
             >
               <CalendarIcon className="h-3 w-3" />
-              {format(new Date(task.deadline), "dd/MM")}
+              {format(fixDateOffset(task.deadline), "dd/MM")}
             </span>
           )}
           {safeAttachments.length > 0 && (

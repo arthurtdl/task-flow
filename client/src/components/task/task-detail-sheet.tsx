@@ -38,6 +38,7 @@ import type { TaskAttachment, TaskWithExtras } from "@/types/task_types";
 import { useTask, useUpdateTask, useDeleteTask } from "@/hooks/use_tasks";
 import { useDeleteAttachment } from "@/hooks/use_attachment";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
+import { fixDateOffset } from "@/lib/fixDataOffset";
 
 interface Props {
   taskId: string | null;
@@ -157,7 +158,7 @@ export function TaskDetailSheet({
                   <div className="h-8 flex items-center gap-1 text-sm">
                     <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
                     {task.deadline
-                      ? format(new Date(task.deadline), "dd/MM/yyyy")
+                      ? format(fixDateOffset(task.deadline), "dd/MM/yyyy")
                       : "—"}
                   </div>
                 </div>
