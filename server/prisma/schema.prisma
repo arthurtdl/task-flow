@@ -74,4 +74,3 @@ model Attachment {
 
   @@map("attachments")
 }
-
