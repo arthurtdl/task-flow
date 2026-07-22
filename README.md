@@ -25,7 +25,7 @@
 
 Confira a demonstração completa das funcionalidades e uma explicação da arquitetura do projeto.
 
-👉 **[Assistir à apresentação do projeto](#)** *(Substitua pelo link do Loom ou YouTube.)*
+👉 **[Assistir à apresentação do projeto](https://youtu.be/W8m4bVX6Z6E?is=-mEli67vAF8seRmm)**
 
 ---
 

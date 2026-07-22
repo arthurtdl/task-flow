@@ -35,6 +35,7 @@ Cada serviço possui uma responsabilidade específica:
 # Frontend
 
 O frontend está hospedado na **Vercel**, com deploy automático sempre que há alterações na branch principal.
+- 👉 https://taskflow-weld-six.vercel.app
 
 As variáveis de ambiente configuradas são:
 
@@ -46,6 +47,7 @@ As variáveis de ambiente configuradas são:
 # Backend
 
 A API está hospedada na **Render** juntamente com o banco PostgreSQL.
+- 👉 https://taskflow-api-ltm0.onrender.com
 
 As principais variáveis utilizadas em produção são:
 
